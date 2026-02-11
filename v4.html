@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine? 💖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 50%, #ff69b4 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== FLOATING FACE PARTICLES ===== */
+        /* INSTRUCTIONS: Replace 'face.png' in the createParticles() function with your image */
+        .particle {
+            position: fixed;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            animation: float-up linear infinite;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            5% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-50vh) translateX(20px);
+            }
+            95% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-110vh) translateX(-20px);
+                opacity: 0;
+            }
+        }
+
+        /* ===== SCREEN CONTAINER ===== */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 80px 20px 40px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.6s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1 {
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: #fff;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: #fff;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .small-text {
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 10px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 15px 40px;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background: #fff;
+            color: #ff69b4;
+        }
+
+        .btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff1744, #ff69b4);
+            color: #fff;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            padding: 20px 60px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .btn-no {
+            background: rgba(255, 255, 255, 0.8);
+            color: #666;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            padding: 10px 25px;
+            position: absolute;
+            transition: all 0.1s ease;
+        }
+
+        /* ===== BUTTON CONTAINER ===== */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            margin-top: 30px;
+            position: relative;
+            min-height: 200px;
+            width: 100%;
+        }
+
+        /* ===== CHOICE CARDS ===== */
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .choice-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+        }
+
+        .choice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-color: #ff69b4;
+        }
+
+        .choice-card.selected {
+            background: linear-gradient(135deg, #ff1744, #ff69b4);
+            color: #fff;
+            border-color: #fff;
+            transform: scale(1.05);
+        }
+
+        .choice-card h3 {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin: 0;
+        }
+
+        /* ===== SUMMARY CARD ===== */
+        .summary-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 500px;
+            margin: 30px auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-card h3 {
+            color: #ff69b4;
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            margin-bottom: 25px;
+        }
+
+        .summary-item {
+            text-align: left;
+            margin: 15px 0;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: #333;
+        }
+
+        .summary-item strong {
+            color: #ff69b4;
+        }
+
+        /* ===== CONFETTI ===== */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: fixed;
+            top: -10px;
+            z-index: 9999;
+            animation: confetti-fall linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* ===== TOAST MESSAGE ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            font-weight: 600;
+            color: #ff69b4;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .choices {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+            }
+
+            .particle {
+                width: 55px;
+                height: 55px;
+            }
+
+            .summary-card {
+                padding: 30px 20px;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            position: fixed;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 1000;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div></div>
+        <div class="controls">
+            <button class="icon-btn" id="musicBtn" title="Toggle Music">🎵</button>
+            <button class="icon-btn" id="resetBtn" title="Reset">🔄</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 1: Home -->
+    <div class="screen active" id="screen1">
+        <h1>hey twin. i have a question…</h1>
+        <button class="btn" onclick="goToScreen(2)">Yes?</button>
+        <p class="small-text" style="margin-top: 30px;">(Hint: play song, super underground you've never heard)</p>
+    </div>
+
+    <!-- SCREEN 2: The Question -->
+    <div class="screen" id="screen2">
+        <h1>will you be my valentine?</h1>
+        <div class="button-container">
+            <button class="btn btn-primary" onclick="sayYes()">YEAAAA 💖</button>
+            <button class="btn btn-no" id="noBtn">no</button>
+        </div>
+        <p class="small-text">(you have no choice nope nope nope)</p>
+    </div>
+
+    <!-- SCREEN 3: Celebration -->
+    <div class="screen" id="screen3">
+        <h1>YEAAAAAAAAA</h1>
+        <h1>LFG 🔥🔥🔥🔥🔥</h1>
+        <p style="margin-top: 40px;">Don't leave. I'm not done with you yet.</p>
+        <button class="btn" onclick="goToScreen(4)">click me 👀</button>
+    </div>
+
+    <!-- SCREEN 4: Food Choice -->
+    <div class="screen" id="screen4">
+        <h2>what food would you like to eat?</h2>
+        <div class="choices">
+            <div class="choice-card" onclick="selectChoice('food', 'Thai')">
+                <h3>🍜 Thai</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('food', 'Pizza')">
+                <h3>🍕 Pizza</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('food', 'Pasta')">
+                <h3>🍝 Pasta</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('food', 'Salad')">
+                <h3>🥗 Salad</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('food', 'Burger')">
+                <h3>🍔 Burger</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: Dessert -->
+    <div class="screen" id="screen5">
+        <h2>what dessert are we eating gang</h2>
+        <div class="choices">
+            <div class="choice-card" onclick="selectChoice('dessert', 'Ice cream')">
+                <h3>🍦 Ice cream</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('dessert', 'Brownie')">
+                <h3>🍫 Brownie</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('dessert', 'Cheesecake')">
+                <h3>🍰 Cheesecake</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('dessert', 'Cookies')">
+                <h3>🍪 Yummy Cookie</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('dessert', 'Surprise me')">
+                <h3>✨ Surprise me</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 6: After Food -->
+    <div class="screen" id="screen6">
+        <h2>what are we doing after?</h2>
+        <p class="small-text">(select all that apply)</p>
+        <div class="choices">
+            <div class="choice-card" onclick="selectChoice('after', 'Rotting')">
+                <h3>🛋️ Rotting</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('after', 'All American')">
+                <h3>📺 All American</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('after', 'Making out ;)')">
+                <h3>💋 Making out ;)</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('after', 'Walk')">
+                <h3>🚶 Walk</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('after', 'Movie')">
+                <h3>🎬 Movie</h3>
+            </div>
+            <div class="choice-card" onclick="selectChoice('after', 'Whatever you want')">
+                <h3>💕 Whatever you want</h3>
+            </div>
+        </div>
+        <button class="btn" onclick="showSummary()" style="margin-top: 30px;">Continue →</button>
+    </div>
+
+    <!-- SCREEN 7: Final Summary -->
+    <div class="screen" id="screen7">
+        <h2>thank you for being my girlfriend ❤️</h2>
+        <div class="summary-card">
+            <h3>Valentine's Plan:</h3>
+            <div class="summary-item"><strong>Food:</strong> <span id="summaryFood">-</span></div>
+            <div class="summary-item"><strong>Dessert:</strong> <span id="summaryDessert">-</span></div>
+            <div class="summary-item"><strong>After:</strong> <span id="summaryAfter">-</span></div>
+        </div>
+        <button class="btn btn-primary" onclick="copyPlan()">Copy our plan 💌</button>
+    </div>
+
+    <!-- Toast Message -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Footer -->
+    <div class="footer">made w/ love by sachin</div>
+
+    <!-- Audio Element -->
+    <audio id="bgMusic" loop>
+        <source src="songs/nbb.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // ===== STATE MANAGEMENT =====
+        let currentScreen = 1;
+        let choices = {
+            food: null,
+            dessert: null,
+            after: [] // Changed to array for multiple selections
+        };
+        let musicPlaying = false;
+
+        // ===== INITIALIZE =====
+        function init() {
+            // Always start on screen 1 when page loads
+            currentScreen = 1;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen1').classList.add('active');
+            
+            loadFromStorage();
+            createParticles();
+            setupNoButton();
+            restoreSelections();
+        }
+
+        // ===== FLOATING FACE PARTICLES =====
+        function createParticles() {
+            const imageSource = 'images/image2.jpeg'; // ← CHANGE THIS to your image filename
+            
+            // Reduced particle count for mobile
+            const particleCount = window.innerWidth < 768 ? 10 : 18;
+            
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Set the background image
+                    particle.style.backgroundImage = `url('${imageSource}')`;
+                    
+                    // Random horizontal position
+                    particle.style.left = Math.random() * 100 + '%';
+                    
+                    // Start particles at different heights for immediate visibility
+                    const startHeight = Math.random() * 120; // 0-120vh
+                    particle.style.top = startHeight + 'vh';
+                    
+                    // Varied animation speeds for natural effect
+                    const duration = 20 + Math.random() * 15; // 20-35 seconds
+                    particle.style.animationDuration = duration + 's';
+                    
+                    // Stagger the start times (but keep them short so they appear quickly)
+                    particle.style.animationDelay = (Math.random() * 2) + 's';
+                    
+                    // Add slight size variation for depth
+                    const sizeVariation = 0.8 + Math.random() * 0.4; // 80% to 120% of base size
+                    particle.style.transform = `scale(${sizeVariation})`;
+                    
+                    document.body.appendChild(particle);
+                }, i * 100); // Faster stagger so they all appear quickly
+            }
+        }
+
+        // ===== SCREEN NAVIGATION =====
+        function goToScreen(screenNum) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen' + screenNum).classList.add('active');
+            currentScreen = screenNum;
+            saveToStorage();
+        }
+
+        // ===== "NO" BUTTON DODGING =====
+        function setupNoButton() {
+            const noBtn = document.getElementById('noBtn');
+            const container = document.querySelector('#screen2 .button-container');
+            
+            noBtn.addEventListener('mouseenter', dodgeButton);
+            noBtn.addEventListener('touchstart', dodgeButton);
+            
+            function dodgeButton(e) {
+                e.preventDefault();
+                const containerRect = container.getBoundingClientRect();
+                const btnRect = noBtn.getBoundingClientRect();
+                
+                // Calculate safe bounds (keeping button fully inside container)
+                const maxX = containerRect.width - btnRect.width;
+                const maxY = containerRect.height - btnRect.height;
+                
+                // Generate random position within bounds
+                const newX = Math.random() * maxX;
+                const newY = Math.random() * maxY;
+                
+                noBtn.style.left = newX + 'px';
+                noBtn.style.top = newY + 'px';
+            }
+        }
+
+        // ===== YES BUTTON - CONFETTI =====
+        function sayYes() {
+            createConfetti();
+            setTimeout(() => {
+                goToScreen(3);
+            }, 1000);
+        }
+
+        function createConfetti() {
+            const colors = ['#ff1744', '#ff69b4', '#ffb6c1', '#ffd1dc', '#fff'];
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (2 + Math.random() * 3) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 20);
+            }
+        }
+
+        // ===== CHOICE SELECTION =====
+        function selectChoice(category, value) {
+            if (category === 'after') {
+                // Handle multiple selections for "after" category
+                const index = choices.after.indexOf(value);
+                if (index > -1) {
+                    // Already selected, remove it
+                    choices.after.splice(index, 1);
+                    event.currentTarget.classList.remove('selected');
+                } else {
+                    // Not selected, add it
+                    choices.after.push(value);
+                    event.currentTarget.classList.add('selected');
+                }
+                saveToStorage();
+                
+                // Don't auto-advance, wait for user to finish selecting
+                return;
+            }
+            
+            // Single selection for food and dessert
+            choices[category] = value;
+            saveToStorage();
+            
+            // Visual feedback
+            const cards = document.querySelector(`#screen${getScreenForCategory(category)} .choices`).children;
+            Array.from(cards).forEach(card => card.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            // Auto-advance after short delay
+            setTimeout(() => {
+                if (category === 'food') goToScreen(5);
+                else if (category === 'dessert') goToScreen(6);
+            }, 500);
+        }
+
+        function getScreenForCategory(category) {
+            if (category === 'food') return 4;
+            if (category === 'dessert') return 5;
+            if (category === 'after') return 6;
+        }
+
+        // ===== SUMMARY SCREEN =====
+        function showSummary() {
+            document.getElementById('summaryFood').textContent = choices.food || '-';
+            document.getElementById('summaryDessert').textContent = choices.dessert || '-';
+            
+            // Handle multiple "after" choices
+            const afterText = choices.after && choices.after.length > 0 
+                ? choices.after.join(', ') 
+                : '-';
+            document.getElementById('summaryAfter').textContent = afterText;
+            
+            goToScreen(7);
+        }
+
+        // ===== COPY PLAN =====
+        function copyPlan() {
+            const afterText = choices.after && choices.after.length > 0 
+                ? choices.after.join(', ') 
+                : '-';
+                
+            const planText = `Valentine's Plan:
+• Food: ${choices.food || '-'}
+• Dessert: ${choices.dessert || '-'}
+• After: ${afterText}`;
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(planText).then(() => {
+                    showToast("Copied! ✅ Now send it to me 👀");
+                }).catch(err => {
+                    console.error('Clipboard error:', err);
+                    fallbackCopy(planText);
+                });
+            } else {
+                fallbackCopy(planText);
+            }
+        }
+        
+        // Fallback copy method for browsers that don't support clipboard API
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                textArea.remove();
+                showToast("Copied! ✅ Now send it to me 👀");
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                textArea.remove();
+                showToast("Copy failed - please copy manually!");
+            }
+        }
+
+        // ===== TOAST NOTIFICATION =====
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ===== LOCAL STORAGE =====
+        function saveToStorage() {
+            const data = {
+                currentScreen,
+                choices
+            };
+            localStorage.setItem('valentineData', JSON.stringify(data));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('valentineData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                // Load choices but don't change screen - always start on screen 1
+                choices = data.choices || { food: null, dessert: null, after: [] };
+                // Ensure after is always an array
+                if (!Array.isArray(choices.after)) {
+                    choices.after = choices.after ? [choices.after] : [];
+                }
+            }
+        }
+
+        function restoreSelections() {
+            // Restore selected cards
+            if (choices.food) {
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('#screen4 .choice-card');
+                    cards.forEach(card => {
+                        if (card.textContent.includes(choices.food)) {
+                            card.classList.add('selected');
+                        }
+                    });
+                }, 100);
+            }
+            
+            if (choices.dessert) {
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('#screen5 .choice-card');
+                    cards.forEach(card => {
+                        if (card.textContent.includes(choices.dessert)) {
+                            card.classList.add('selected');
+                        }
+                    });
+                }, 100);
+            }
+            
+            if (choices.after && choices.after.length > 0) {
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('#screen6 .choice-card');
+                    cards.forEach(card => {
+                        choices.after.forEach(selectedChoice => {
+                            if (card.textContent.includes(selectedChoice)) {
+                                card.classList.add('selected');
+                            }
+                        });
+                    });
+                }, 100);
+            }
+
+            // Update summary if on final screen
+            if (currentScreen === 7) {
+                showSummary();
+            }
+        }
+
+        // ===== MUSIC TOGGLE =====
+        document.getElementById('musicBtn').addEventListener('click', () => {
+            const music = document.getElementById('bgMusic');
+            const btn = document.getElementById('musicBtn');
+            
+            if (musicPlaying) {
+                music.pause();
+                btn.textContent = '🎵';
+                musicPlaying = false;
+            } else {
+                music.play();
+                btn.textContent = '🔇';
+                musicPlaying = true;
+            }
+        });
+
+        // ===== RESET BUTTON =====
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (confirm('Reset everything? This will clear your progress.')) {
+                localStorage.removeItem('valentineData');
+                choices = { food: null, dessert: null, after: [] };
+                currentScreen = 1;
+                
+                // Remove selected class from all cards
+                document.querySelectorAll('.choice-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Go to screen 1
+                goToScreen(1);
+            }
+        });
+
+        // ===== START APP =====
+        init();
+    </script>
+</body>
+</html>
